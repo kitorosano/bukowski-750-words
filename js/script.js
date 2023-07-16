@@ -1,5 +1,4 @@
 ;(function () {
-
   /* ======= DECLARATIONS ======= */
   const MINIMUM_WORDS_PER_POST = 750
   const MonthsWith31Days = [0, 2, 4, 6, 7, 9, 11]
@@ -75,12 +74,8 @@
     let tx = db.transaction('posts', 'readonly'),
       store = tx.objectStore('posts'),
       index = store.index('date_range'),
-      firstDayMonth = dateFormatter(
-        new Date(year, month, 1)
-      ),
-      lastDayMonth = dateFormatter(
-        new Date(year, month + 1, 0)
-      ),
+      firstDayMonth = dateFormatter(new Date(year, month, 1)),
+      lastDayMonth = dateFormatter(new Date(year, month + 1, 0)),
       range = IDBKeyRange.bound(firstDayMonth, lastDayMonth),
       cursor = index.openCursor(range)
 
@@ -167,13 +162,19 @@
       selectedMonth = 11
       selectedYear--
     }
-    PREV_MONTH_ELEMENT.innerHTML = "&blacktriangleleft;" + getMonthShortName(new Date(selectedYear, selectedMonth - 1, 1))
-    CURR_MONTH_ELEMENT.textContent = getMonthShortName(new Date(selectedYear, selectedMonth, 1))
-    NEXT_MONTH_ELEMENT.innerHTML = getMonthShortName(new Date(selectedYear, selectedMonth + 1, 1)) + "&blacktriangleright;"
+    PREV_MONTH_ELEMENT.innerHTML =
+      '&blacktriangleleft;' +
+      getMonthShortName(new Date(selectedYear, selectedMonth - 1, 1))
+    CURR_MONTH_ELEMENT.textContent = getMonthShortName(
+      new Date(selectedYear, selectedMonth, 1)
+    )
+    NEXT_MONTH_ELEMENT.innerHTML =
+      getMonthShortName(new Date(selectedYear, selectedMonth + 1, 1)) +
+      '&blacktriangleright;'
 
     POST_CONTENT_ELEMENT.textContent = ''
     displayPosts()
-  });
+  })
 
   NEXT_MONTH_ELEMENT.addEventListener('click', (e) => {
     e.preventDefault()
@@ -182,24 +183,34 @@
       selectedMonth = 0
       selectedYear++
     }
-    PREV_MONTH_ELEMENT.innerHTML = "&blacktriangleleft;" + getMonthShortName(new Date(selectedYear, selectedMonth - 1, 1))
-    CURR_MONTH_ELEMENT.textContent = getMonthShortName(new Date(selectedYear, selectedMonth, 1))
-    NEXT_MONTH_ELEMENT.innerHTML = getMonthShortName(new Date(selectedYear, selectedMonth + 1, 1)) + "&blacktriangleright;"
+    PREV_MONTH_ELEMENT.innerHTML =
+      '&blacktriangleleft;' +
+      getMonthShortName(new Date(selectedYear, selectedMonth - 1, 1))
+    CURR_MONTH_ELEMENT.textContent = getMonthShortName(
+      new Date(selectedYear, selectedMonth, 1)
+    )
+    NEXT_MONTH_ELEMENT.innerHTML =
+      getMonthShortName(new Date(selectedYear, selectedMonth + 1, 1)) +
+      '&blacktriangleright;'
 
     POST_CONTENT_ELEMENT.textContent = ''
     displayPosts()
-  });
+  })
 
   /* ======= POST HISTORY RECORD ======= */
   async function displayPosts() {
-    let posts = (await getMonthlyPostsByUser(currentUser, selectedMonth, selectedYear)) || []
+    let posts =
+      (await getMonthlyPostsByUser(currentUser, selectedMonth, selectedYear)) ||
+      []
     let daysInSelectedMonth = 28
 
     if (MonthsWith31Days.includes(selectedMonth)) daysInSelectedMonth = 31
     else if (MonthsWith30Days.includes(selectedMonth)) daysInSelectedMonth = 30
 
-    currentPost = null;
-    POST_TITLE_ELEMENT.value = defaultPostTitle(dateFormatter(new Date(selectedYear, selectedMonth, selectedDay)))
+    currentPost = null
+    POST_TITLE_ELEMENT.value = defaultPostTitle(
+      dateFormatter(new Date(selectedYear, selectedMonth, selectedDay))
+    )
     POST_TITLE_ELEMENT.readOnly = true
     POST_CONTENT_ELEMENT.value = ''
     POST_CONTENT_ELEMENT.readOnly = true
@@ -222,8 +233,7 @@
 
         if (postFromDate.count > MINIMUM_WORDS_PER_POST)
           li.classList.add('complete')
-        else if (postFromDate.count > 0) 
-          li.classList.add('incomplete')
+        else if (postFromDate.count > 0) li.classList.add('incomplete')
       }
 
       const isToday = li.dataset.date === dateFormatter(new Date())
@@ -232,16 +242,16 @@
         currentPost = postFromDate
       }
 
-      if(selectedDay === i && postFromDate) {
+      if (selectedDay === i && postFromDate) {
         POST_TITLE_ELEMENT.value = postFromDate.title
         POST_CONTENT_ELEMENT.value = postFromDate.text
         WORD_COUNT_ELEMENT.textContent = postFromDate.count
       }
-      
+
       li.addEventListener('click', () => {
         const day = li.dataset.date.split('-')[2]
         selectedDay = parseInt(day)
-        displayPosts();
+        displayPosts()
       })
 
       POSTS_HISTORY_CONTAINER_ELEMENT.appendChild(li)
@@ -323,14 +333,13 @@
     })
     return `${dayName[0].toUpperCase()}${dayName.slice(
       1
-    )}, ${day} de ${monthName[0].toUpperCase()}${monthName.slice(
-      1
-    )}, ${year}`
-
+    )}, ${day} de ${monthName[0].toUpperCase()}${monthName.slice(1)}, ${year}`
   }
   function getMonthShortName(date) {
-    return date.toLocaleDateString('es-UY', {
-      month: 'short'
-    }).replace('.','')
+    return date
+      .toLocaleDateString('es-UY', {
+        month: 'short'
+      })
+      .replace('.', '')
   }
 })()
