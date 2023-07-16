@@ -24,8 +24,7 @@
     currentUser = localStorage.getItem('currentUser') || 'Bret',
     selectedYear = new Date().getFullYear(),
     selectedMonth = new Date().getMonth(),
-    selectedDay = new Date().getDate(),
-    dbUpgraded = false
+    selectedDay = new Date().getDate();
 
   /* ======= DECLARATIONS: INDEXED DB - FETCH USERS ======= */
   const indexedDB =
@@ -41,17 +40,17 @@
     console.error('DB Error', openRequest.error)
   }
 
-  openRequest.onupgradeneeded = function () {
+  openRequest.onupgradeneeded = async function () {
     db = openRequest.result
     let store = db.createObjectStore('posts', { keyPath: 'id' })
     store.createIndex('date_range', 'date')
-    dbUpgraded = true
+    await initializeUsers()
+    await loadUserPosts()
   }
   openRequest.onsuccess = async function () {
     db = openRequest.result
 
     await initializeUsers()
-    dbUpgraded && (await loadUserPosts())
     displayUsers()
   }
 
